@@ -1,3 +1,4 @@
+import 'package:expey/data/database.dart';
 import 'package:expey/datetime/date_time_helper.dart';
 import 'package:expey/models/expense_item.dart';
 import 'package:flutter/material.dart';
@@ -11,17 +12,26 @@ class ExpenseData extends ChangeNotifier{
   List<ExpenseItem> getAllExpenseList() {
     return overallExpenseList;
   }
+  final db =HiveDataBase();
+  void prepareData(){
+    if(db.readData().isNotEmpty){
+      overallExpenseList =db.readData();
+    }
+  }
+
   //add new expense
   void addNewExpense(ExpenseItem newExpense)
   {
     overallExpenseList.add(newExpense);
     notifyListeners();
+    db.saveData(overallExpenseList);
   }
   //delete expense
   void deleteExpense(ExpenseItem expense)
   {
     overallExpenseList.remove(expense);
     notifyListeners();
+    db.saveData(overallExpenseList);
   }
   //get weekday from a dateTime object
   String getDayName (DateTime dateTime)

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:expey/components/expense_summary.dart';
 import 'package:expey/components/expense_tile.dart';
 import 'package:expey/data/expense_data.dart';
@@ -15,6 +17,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final newExpenseNameController = TextEditingController();
   final newExpenseAmountController = TextEditingController();
+
+  @override
+  void initState(){
+    super.initState();
+
+    Provider.of<ExpenseData>(context,listen: false).prepareData();
+  }
 
   void addNewExpense() {
     showDialog(
@@ -52,19 +61,28 @@ class _HomePageState extends State<HomePage> {
             ));
   }
 
+  void deleteExpense(ExpenseItem expense){
+    Provider.of<ExpenseData>(context,listen: false).deleteExpense(expense);
+  }
+
+
   void save() {
-    ExpenseItem newExpense = ExpenseItem(
+    if (newExpenseNameController.text.isNotEmpty && newExpenseAmountController.text.isNotEmpty) {
+          ExpenseItem newExpense = ExpenseItem(
       name: newExpenseNameController.text,
       amount: newExpenseAmountController.text,
       dateTime: DateTime.now(),
     );
     Provider.of<ExpenseData>(context, listen: false).addNewExpense(newExpense);
+    }
 
     Navigator.pop(context);
+    clear();
   }
 
   void cancel() {
     Navigator.pop(context);
+    clear();
   }
 
   void clear() {
@@ -95,7 +113,9 @@ class _HomePageState extends State<HomePage> {
                   itemBuilder: ((context, index) => ExpenseTile(
                       name: value.getAllExpenseList()[index].name,
                       amount: value.getAllExpenseList()[index].amount,
-                      dateTime: value.getAllExpenseList()[index].dateTime)),
+                      dateTime: value.getAllExpenseList()[index].dateTime,
+                      deleteTapped:(p0)=>
+                        deleteExpense(value.getAllExpenseList()[index]))),
                 )
               ],
             )));

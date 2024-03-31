@@ -2,7 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:expey/models/expense_item.dart';
 
 class HiveDataBase{
-  final _myBox = Hive.box("expense_database");
+  final _myBox = Hive.box("expey_database");
 
   void saveData(List<ExpenseItem> allExpense){
 
@@ -18,6 +18,26 @@ class HiveDataBase{
       allExpensesFormatted.add(expenseFormatted);
       
     }
+
+    _myBox.put("ALL_EXPENSES",allExpensesFormatted);
+  }
+
+    List<ExpenseItem> readData(){
+
+      List savedExpenses = _myBox.get("ALL_EXPENSES")?? [];
+      List<ExpenseItem> allExpenses = [];
+
+      for (var i = 0; i < savedExpenses.length; i++) {
+        String name=savedExpenses[i][0];
+        String amount=savedExpenses[i][1];
+        DateTime dateTime=savedExpenses[i][2];
+
+        ExpenseItem expense =ExpenseItem(name: name, amount: amount, dateTime: dateTime);
+
+        allExpenses.add(expense);
+        
+      }
+      return allExpenses;
+    }
     
   }
-}
